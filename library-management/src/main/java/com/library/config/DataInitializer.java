@@ -6,15 +6,20 @@ import com.library.entity.Magazine;
 import com.library.entity.Member;
 import com.library.repository.DocumentRepository;
 import com.library.repository.MemberRepository;
+import com.library.entity.Admin;
+import com.library.entity.Role;
+import com.library.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initDatabase(DocumentRepository docRepo, MemberRepository memberRepo) {
+    CommandLineRunner initDatabase(DocumentRepository docRepo, MemberRepository memberRepo, 
+                                   UserRepository userRepo, PasswordEncoder passwordEncoder) {
         return args -> {
             // Chỉ nạp dữ liệu nếu chưa có
             if (docRepo.count() > 0) {
@@ -24,19 +29,34 @@ public class DataInitializer {
 
             System.out.println("Đang nạp dữ liệu mẫu...");
 
+            // Tạo Admin
+            if (userRepo.findByUsername("admin").isEmpty()) {
+                Admin admin = new Admin();
+                admin.setUsername("admin");
+                admin.setPassword(passwordEncoder.encode("123456"));
+                admin.setFullName("Quản trị viên Hệ thống");
+                admin.setEmail("admin@library.com");
+                admin.setRole(Role.ADMIN);
+                userRepo.save(admin);
+            }
+
             // Tạo độc giả
             Member member1 = new Member();
             member1.setUsername("member1");
+            member1.setPassword(passwordEncoder.encode("123456"));
             member1.setFullName("Nguyễn Văn A");
             member1.setEmail("vana@gmail.com");
+            member1.setRole(Role.MEMBER);
             member1.setMaxBorrowLimit(5);
             member1.setCurrentBorrowCount(0);
             memberRepo.save(member1);
 
             Member member2 = new Member();
             member2.setUsername("member2");
+            member2.setPassword(passwordEncoder.encode("123456"));
             member2.setFullName("Trần Thị B");
             member2.setEmail("thib@gmail.com");
+            member2.setRole(Role.MEMBER);
             member2.setMaxBorrowLimit(3);
             member2.setCurrentBorrowCount(0);
             memberRepo.save(member2);

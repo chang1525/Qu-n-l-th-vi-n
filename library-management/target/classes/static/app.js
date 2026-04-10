@@ -44,14 +44,29 @@ function hideLoading() {
 }
 
 async function apiRequest(url, options = {}) {
+    const token = localStorage.getItem('auth_token');
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json;charset=UTF-8',
+        ...options.headers
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json;charset=UTF-8',
-            ...options.headers
-        },
+        headers,
         ...options
     });
+
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        window.location.href = 'login.html';
+        throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+    }
 
     const contentType = response.headers.get('content-type') || '';
     let data;
@@ -171,7 +186,7 @@ async function loadTransactions() {
 }
 
 // ============================
-// Members List Rendering
+// Members List Rendering & Creation
 // ============================
 function renderMembersList() {
     const container = document.getElementById('membersList');
@@ -188,7 +203,7 @@ function renderMembersList() {
                 <div class="member-avatar">${initials}</div>
                 <div class="member-info">
                     <div class="member-name">${escapeHtml(m.fullName)}</div>
-                    <div class="member-meta">ID: ${m.id} • ${m.email || ''}</div>
+                    <div class="member-meta">ID: ${m.id} • ${m.username || ''}</div>
                 </div>
                 <span class="member-status ${canBorrow ? 'ok' : 'limit'}">
                     ${m.currentBorrowCount}/${m.maxBorrowLimit}
@@ -196,6 +211,41 @@ function renderMembersList() {
             </div>
         `;
     }).join('');
+}
+
+function initAddMember() {
+    const form = document.getElementById('addMemberForm');
+    if (!form) return;
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const fullName = document.getElementById('newMemberName').value.trim();
+        const username = document.getElementById('newMemberUsername').value.trim();
+        const email = document.getElementById('newMemberEmail').value.trim();
+        const btn = document.getElementById('addMemberBtn');
+        
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang cấp thẻ...';
+        
+        try {
+            const result = await apiRequest(`${API_BASE}/members`, {
+                method: 'POST',
+                body: JSON.stringify({ fullName, username, email })
+            });
+            
+            showToast(result.message || 'Cấp thẻ thành công! Mật khẩu mặc định là 123456.', 'success');
+            form.reset();
+            
+            // Reload members explicitly
+            await loadMembers();
+        } catch (err) {
+            showToast(err.message || 'Không thể tạo thẻ.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '+ Cấp Thẻ Thư Viện';
+        }
+    });
 }
 
 // ============================
@@ -221,7 +271,8 @@ function populateDocumentSelect() {
 
 function populateReturnSelect() {
     const select = document.getElementById('returnTransactionId');
-    const active = cachedTransactions.filter(t => t.status === 'ĐANG MƯỢN');
+    // Filter by returnDate being null (not returned yet) instead of Vietnamese status string
+    const active = cachedTransactions.filter(t => !t.returnDate);
 
     if (active.length === 0) {
         select.innerHTML = '<option value="">-- Không có giao dịch nào đang mượn --</option>';
@@ -449,7 +500,7 @@ function renderTransactionsTable() {
     const sorted = [...cachedTransactions].sort((a, b) => b.id - a.id);
 
     tbody.innerHTML = sorted.map(t => {
-        const isBorrowing = t.status === 'ĐANG MƯỢN';
+        const isBorrowing = !t.returnDate;
         const fineClass = t.fineAmount > 0 ? 'fine-amount' : 'fine-amount zero';
 
         return `
@@ -515,13 +566,45 @@ function initScrollAnimations() {
 // ============================
 // Initialize Application
 // ============================
+
+function checkAuth() {
+    const token = localStorage.getItem('auth_token');
+    const userStr = localStorage.getItem('auth_user');
+    const authMenu = document.getElementById('authMenu');
+    
+    if (token && userStr) {
+        let user = null;
+        try { user = JSON.parse(userStr); } catch(e){}
+        
+        if (user) {
+            authMenu.innerHTML = `
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-light);">Xin chào, ${Object.values(user)[0] || 'Member'}</span>
+                <button onclick="logout()" class="btn btn-outline btn-sm">Đăng Xuất</button>
+            `;
+            return true;
+        }
+    }
+    
+    authMenu.innerHTML = '<a href="login.html" class="btn btn-primary btn-sm" id="navLoginBtn">Đăng Nhập</a>';
+    return false;
+}
+
+window.logout = function() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    window.location.reload();
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(hideLoading, 800);
 
+    const isAuthenticated = checkAuth();
+    
     initNavbar();
     initSearch();
     initBorrow();
     initReturn();
+    initAddMember();
     initScrollAnimations();
 
     // Refresh history button

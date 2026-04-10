@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Thư Viện Tương Lai</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .auth-header {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .auth-logo {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+            display: inline-block;
+        }
+
+        .auth-form .form-group {
+            text-align: left;
+            margin-bottom: var(--space-lg);
+        }
+
+        .auth-links {
+            margin-top: var(--space-xl);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-links a {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Shapes -->
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="auth-container">
+        <div class="glass-card auth-card">
+            <div class="auth-header">
+                <span class="auth-logo">📚</span>
+                <h1 class="section-title">Chào mừng trở lại</h1>
+                <p class="section-subtitle">Đăng nhập để vào không gian thư viện của bạn</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" class="form-input" placeholder="Nhập username" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu" required />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn">
+                    Đăng Nhập
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <span><i>Hệ thống quản trị truy cập nội bộ</i></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Toast implementation
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '⚠️';
+
+            toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></span> Đang xử lý...`;
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản.');
+                }
+
+                const data = await response.json();
+                
+                // Lưu token vào localStorage
+                localStorage.setItem('auth_token', data.token);
+                localStorage.setItem('auth_user', JSON.stringify({
+                    username: data.username,
+                    role: data.role,
+                    id: data.id
+                }));
+
+                showToast('Đăng nhập thành công!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Đăng Nhập';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -33,6 +33,9 @@
                 <a href="#return" class="nav-link" data-section="return">Trả Sách</a>
                 <a href="#history" class="nav-link" data-section="history">Lịch Sử</a>
             </nav>
+            <div id="authMenu" style="display: flex; align-items: center; gap: var(--space-sm); margin-left: var(--space-md);">
+                <a href="login.html" class="btn btn-primary btn-sm" id="navLoginBtn">Đăng Nhập</a>
+            </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
                 <span></span><span></span><span></span>
             </button>
@@ -195,6 +198,23 @@
                 <!-- Members Quick View -->
                 <div class="members-card glass-card">
                     <h3 class="card-title">👥 Danh Sách Độc Giả</h3>
+                    
+                    <form id="addMemberForm" style="margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--glass-border);">
+                        <h4 style="margin-bottom: var(--space-sm); font-size: 1rem;">Tạo Thẻ Độc Giả Mới</h4>
+                        <div class="form-group" style="margin-bottom: var(--space-xs);">
+                            <input type="text" id="newMemberName" class="form-input" placeholder="Họ và Tên" required style="padding: 0.5rem; font-size: 0.9rem;" />
+                        </div>
+                        <div class="form-group" style="margin-bottom: var(--space-xs);">
+                            <input type="text" id="newMemberUsername" class="form-input" placeholder="Username (Tên đăng nhập)" required style="padding: 0.5rem; font-size: 0.9rem;" />
+                        </div>
+                        <div class="form-group" style="margin-bottom: var(--space-sm);">
+                            <input type="email" id="newMemberEmail" class="form-input" placeholder="Email" style="padding: 0.5rem; font-size: 0.9rem;" />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm btn-full" id="addMemberBtn">
+                            + Cấp Thẻ Thư Viện
+                        </button>
+                    </form>
+
                     <div class="members-list" id="membersList">
                         <div class="loading-text">Đang tải...</div>
                     </div>

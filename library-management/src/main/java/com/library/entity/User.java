@@ -9,6 +9,9 @@ import lombok.*;
 @Getter @Setter
 public abstract class User extends BaseEntity {
     private String username;
+    private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private String fullName;
     private String email;
     public abstract double calculateFine(int daysLate);
