@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Thư Viện</title>
+    <meta name="description" content="Hệ thống quản lý thư viện trực tuyến - Tìm kiếm, mượn trả tài liệu dễ dàng">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header / Navigation -->
+    <header class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo" id="logo">
+                <span class="logo-icon">📚</span>
+                <span class="logo-text">Thư Viện</span>
+            </a>
+            <nav class="nav-links" id="navLinks">
+                <a href="#hero" class="nav-link active" data-section="hero">Trang Chủ</a>
+                <a href="#search" class="nav-link" data-section="search">Tìm Kiếm</a>
+                <a href="#borrow" class="nav-link" data-section="borrow">Mượn Sách</a>
+                <a href="#return" class="nav-link" data-section="return">Trả Sách</a>
+                <a href="#history" class="nav-link" data-section="history">Lịch Sử</a>
+            </nav>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="container hero-content">
+            <div class="hero-badge">✨ Hệ Thống Quản Lý Hiện Đại</div>
+            <h1 class="hero-title">
+                Quản Lý <span class="gradient-text">Thư Viện</span><br>Thông Minh & Hiệu Quả
+            </h1>
+            <p class="hero-subtitle">
+                Tìm kiếm tài liệu, mượn trả sách nhanh chóng với hệ thống quản lý thư viện trực tuyến hiện đại.
+            </p>
+            <div class="hero-actions">
+                <a href="#search" class="btn btn-primary btn-lg" id="heroSearchBtn">
+                    🔍 Tìm Kiếm Tài Liệu
+                </a>
+                <a href="#borrow" class="btn btn-outline btn-lg" id="heroBorrowBtn">
+                    📖 Mượn Sách Ngay
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalDocuments">--</span>
+                    <span class="stat-label">Tài Liệu</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalMembers">--</span>
+                    <span class="stat-label">Độc Giả</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalTransactions">--</span>
+                    <span class="stat-label">Giao Dịch</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="section" id="search">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">🔍 Tìm Kiếm</span>
+                <h2 class="section-title">Tìm Kiếm <span class="gradient-text">Tài Liệu</span></h2>
+                <p class="section-subtitle">Tìm kiếm sách, tạp chí, tập san theo từ khóa, tác giả, thể loại hoặc năm xuất bản</p>
+            </div>
+
+            <div class="search-card glass-card">
+                <form class="search-form" id="searchForm">
+                    <div class="search-grid">
+                        <div class="form-group">
+                            <label for="searchKeyword">Từ khóa</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔤</span>
+                                <input type="text" id="searchKeyword" placeholder="Nhập tên tài liệu..." class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchAuthor">Tác giả</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">✍️</span>
+                                <input type="text" id="searchAuthor" placeholder="Nhập tên tác giả..." class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchCategory">Thể loại</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📂</span>
+                                <input type="text" id="searchCategory" placeholder="Nhập thể loại..." class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchYear">Năm xuất bản</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📅</span>
+                                <input type="number" id="searchYear" placeholder="VD: 2024" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-actions">
+                        <button type="submit" class="btn btn-primary" id="searchBtn">
+                            🔍 Tìm Kiếm
+                        </button>
+                        <button type="button" class="btn btn-outline" id="clearSearchBtn">
+                            🗑️ Xóa Bộ Lọc
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search Results -->
+            <div class="results-container" id="resultsContainer" style="display: none;">
+                <div class="results-header">
+                    <h3 class="results-title">📋 Kết Quả Tìm Kiếm</h3>
+                    <span class="results-count" id="resultsCount">0 kết quả</span>
+                </div>
+                <div class="results-grid" id="resultsGrid"></div>
+                <div class="no-results" id="noResults" style="display: none;">
+                    <div class="no-results-icon">📭</div>
+                    <h3>Không tìm thấy kết quả</h3>
+                    <p>Hãy thử thay đổi từ khóa tìm kiếm hoặc xóa bộ lọc</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Borrow Section -->
+    <section class="section section-alt" id="borrow">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">📖 Mượn Sách</span>
+                <h2 class="section-title">Mượn <span class="gradient-text">Tài Liệu</span></h2>
+                <p class="section-subtitle">Chọn độc giả và tài liệu để mượn sách</p>
+            </div>
+
+            <div class="borrow-layout">
+                <div class="action-card glass-card">
+                    <div class="card-icon">📖</div>
+                    <h3 class="card-title">Phiếu Mượn Sách</h3>
+                    <form class="action-form" id="borrowForm">
+                        <div class="form-group">
+                            <label for="borrowMemberId">Chọn Độc Giả</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">👤</span>
+                                <select id="borrowMemberId" class="form-input form-select" required>
+                                    <option value="">-- Đang tải danh sách --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="borrowDocumentId">Chọn Tài Liệu</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📄</span>
+                                <select id="borrowDocumentId" class="form-input form-select" required>
+                                    <option value="">-- Đang tải danh sách --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" id="borrowBtn">
+                            📖 Xác Nhận Mượn
+                        </button>
+                    </form>
+                    <div class="info-box">
+                        <div class="info-icon">ℹ️</div>
+                        <div class="info-content">
+                            <strong>Lưu ý:</strong> Mỗi độc giả được mượn tối đa <strong>5 cuốn</strong>.
+                            Thời hạn mượn là <strong>14 ngày</strong>. Trả trễ sẽ bị tính phí phạt.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Quick View -->
+                <div class="members-card glass-card">
+                    <h3 class="card-title">👥 Danh Sách Độc Giả</h3>
+                    <div class="members-list" id="membersList">
+                        <div class="loading-text">Đang tải...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Return Section -->
+    <section class="section" id="return">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">📥 Trả Sách</span>
+                <h2 class="section-title">Trả <span class="gradient-text">Tài Liệu</span></h2>
+                <p class="section-subtitle">Chọn giao dịch đang mượn để trả sách</p>
+            </div>
+
+            <div class="action-card glass-card" style="max-width: 700px; margin: 0 auto;">
+                <div class="card-icon">📥</div>
+                <h3 class="card-title">Phiếu Trả Sách</h3>
+                <form class="action-form" id="returnForm">
+                    <div class="form-group">
+                        <label for="returnTransactionId">Chọn Giao Dịch Cần Trả</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🧾</span>
+                            <select id="returnTransactionId" class="form-input form-select" required>
+                                <option value="">-- Đang tải giao dịch --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="returnBtn">
+                        📥 Xác Nhận Trả Sách
+                    </button>
+                </form>
+                <div class="info-box info-warning">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <strong>Phí phạt trả trễ:</strong><br>
+                        • Sách: <strong>5.000đ/ngày</strong> &nbsp;
+                        • Tạp chí: <strong>2.000đ/ngày</strong> &nbsp;
+                        • Tập san: <strong>3.000đ/ngày</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="section section-alt" id="history">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">📊 Lịch Sử</span>
+                <h2 class="section-title">Lịch Sử <span class="gradient-text">Giao Dịch</span></h2>
+                <p class="section-subtitle">Theo dõi tất cả hoạt động mượn trả sách trong hệ thống</p>
+            </div>
+
+            <div class="glass-card table-card">
+                <div class="table-header">
+                    <button class="btn btn-outline btn-sm" id="refreshHistoryBtn">🔄 Làm Mới</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table" id="transactionsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Độc Giả</th>
+                                <th>Tài Liệu</th>
+                                <th>Ngày Mượn</th>
+                                <th>Hạn Trả</th>
+                                <th>Ngày Trả</th>
+                                <th>Tiền Phạt</th>
+                                <th>Trạng Thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <tr><td colspan="8" class="loading-text">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="no-results" id="noTransactions" style="display: none;">
+                    <div class="no-results-icon">📭</div>
+                    <h3>Chưa có giao dịch nào</h3>
+                    <p>Hãy thử mượn sách để bắt đầu</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">📚</span>
+                    <span class="logo-text">Hệ Thống Quản Lý Thư Viện</span>
+                </div>
+                <p class="footer-text">
+                    Java Spring Boot + MySQL | OOP & Design Patterns (Singleton, Factory, Strategy)
+                </p>
+                <div class="footer-links">
+                    <a href="/swagger-ui.html" target="_blank" class="footer-link">📋 Swagger API</a>
+                    <a href="#search" class="footer-link">🔍 Tìm Kiếm</a>
+                    <a href="#borrow" class="footer-link">📖 Mượn Sách</a>
+                    <a href="#history" class="footer-link">📊 Lịch Sử</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
